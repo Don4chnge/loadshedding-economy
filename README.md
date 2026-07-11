@@ -1,63 +1,81 @@
 # Load Shedding's Economic Ripple Effect
 
-> **Key finding:** _[TO BE COMPLETED after Phase 3 — state the headline result here first, e.g. "Each additional stage-day of load shedding per month is associated with an X% change in real retail trade sales, with a lag of N months (r = …, p = …, 95% CI […, …])."]_
+**Does the severity of Eskom's load shedding measurably move South African retail trade sales — and by how much?**
 
-A data-driven investigation into how Eskom load shedding stages correlate with — and potentially predict — shifts in South African economic indicators, primarily **retail trade sales**, over time.
+## 🔑 Key Finding
 
-**Core research question:** Does the severity and duration of load shedding measurably move South African economic activity, and by how much, with what time lag?
-
-## Key visuals
-
-_[3–5 exported PNGs embedded here after Phase 5 — e.g.]_
-
-<!-- ![Load shedding vs retail sales](charts/01_timeseries_overlay.png) -->
-<!-- ![Lag correlation](charts/02_lag_correlation.png) -->
-<!-- ![Regression fit](charts/03_regression.png) -->
-
-## Project structure
-
-```
-├── README.md
-├── requirements.txt
-├── notebooks/
-│   └── 01_loadshedding_economy_analysis.ipynb   # main analysis
-├── src/
-│   └── data_prep.py                             # cleaning helpers
-├── data/
-│   ├── raw/                                     # untouched downloads (source + access date noted)
-│   └── processed/                               # cleaned, merged datasets
-├── charts/                                      # exported PNG visuals
-└── reports/                                     # 3–5 page research-style report
-```
-
-## Data sources
-
-| Dataset | Source | Access date |
-| --- | --- | --- |
-| Historical load shedding / manual load reduction | [Eskom Data Portal](https://www.eskom.co.za/dataportal/) | _[date]_ |
-| Retail trade sales (P6242.1), constant 2019 prices | [Stats SA time series](https://www.statssa.gov.za/?page_id=1847) | _[date]_ |
-
-## How to run
-
-```bash
-pip install -r requirements.txt
-jupyter notebook notebooks/01_loadshedding_economy_analysis.ipynb
-```
-
-Raw data files are included in `data/raw/` so results are reproducible without re-downloading.
-
-## Methodology (summary)
-
-1. **Collection** — official Eskom outage data + Stats SA retail trade sales
-2. **Cleaning & alignment** — standardised to monthly granularity, merged into one dataframe
-3. **Statistical analysis** — Pearson correlation with p-values and 95% confidence intervals; lag analysis (0–4 months)
-4. **Modelling** — OLS regression quantifying impact; Prophet forecast using load shedding as a regressor
-5. **Interpretation** — findings stated with limitations (correlation vs. causation, confounders such as COVID-19, interest rates, fuel prices)
-
-## Limitations
-
-_[Completed in Phase 6 — honest discussion of confounders, data gaps, and causal caveats.]_
+Yes. Across 49 months of real, matched data (April 2022 – April 2026), heavier load shedding was reliably associated with weaker retail trade sales growth: **r = -0.649 (p < 0.0001, 95% CI: -0.786 to -0.450)**. This holds even after controlling for the general upward drift in retail sales over time. The difference between a calm month (0 MW of manual load reduction) and Eskom's worst month (3,213 MW) is associated with an estimated **6.0 percentage-point swing in retail trade sales growth (95% CI: 3.0 to 9.1 points)**.
 
 ---
 
-*Portfolio project — final-year BSc IT (Data Science). Built July 2026.*
+## Project Overview
+
+A data-driven investigation into how the severity of Eskom's grid deficits — measured by **Manual Load Reduction (MLR)**, the official megawatt figure ordered by the National Control Centre — correlates with, and potentially predicts, shifts in South African retail trade sales.
+
+This project combines two real, official South African data sources, applies formal statistical testing (Pearson correlation, p-values, 95% confidence intervals), tests for lagged/delayed effects, and builds a regression model that quantifies the relationship in real-world terms rather than stopping at "a correlation exists."
+
+Built as a portfolio project for a BSc IT (Data Science) final-year student applying to the Big Data Analytics postgraduate program at Wits University.
+
+## Repository Structure
+
+```
+├── README.md                  # This file
+├── notebooks/
+│   └── 01_loadshedding_economy_analysis.ipynb   # Full analysis pipeline
+├── data/
+│   ├── raw/                   # Untouched original downloads + SOURCES.md
+│   └── processed/
+│       └── monthly_merged.csv # Cleaned, merged monthly dataset
+├── charts/
+│   └── 01_timeseries_overlay.png
+├── reports/                    # 3–5 page research-style report (coming next)
+└── requirements.txt
+```
+
+## Data Sources
+
+| Source | What it provides | Granularity |
+|---|---|---|
+| [Eskom Data Portal](https://www.eskom.co.za/dataportal) | Manual Load Reduction (MLR) in MW — the actual electrical deficit ordered by the National Control Centre | Hourly, aggregated to monthly averages for this analysis |
+| [StatsSA P6242.1](https://www.statssa.gov.za/) | Retail trade sales, constant 2019 prices ("Total," actual values) | Monthly |
+
+Exact access dates and source URLs are logged in [`data/raw/SOURCES.md`](data/raw/SOURCES.md).
+
+## Methodology
+
+1. **Cleaning & alignment** — Eskom's hourly MLR readings were aggregated into monthly averages. StatsSA's wide-format sheet (one row per category, one column per month) was reshaped into a standard monthly time series, and year-on-year percentage growth was calculated directly from the raw Rand values. The two series were merged on month, keeping only months present in both.
+2. **Statistical testing** — Pearson correlation with 95% confidence intervals (via Fisher z-transformation), tested at lags 0–4 months to check for a delayed effect.
+3. **Modelling** — OLS regression of retail YoY growth on load shedding intensity, controlling for a linear time trend, to isolate the effect of load shedding from the general trend in the data.
+
+## Findings
+
+- **Contemporaneous correlation:** r = -0.649, p < 0.0001, n = 49, 95% CI [-0.786, -0.450]
+- **Lag analysis:** Significant at every lag from 0–4 months (r ranging from -0.649 to -0.698), with no meaningful decay. This flat pattern most likely reflects two distinct eras in the data — severe, sustained load shedding through 2022–2023 giving way to its near-complete disappearance from 2024 onward — rather than a precise month-specific delay.
+- **Regression:** Load shedding intensity remains a significant predictor (coefficient = -0.0019 percentage points per MW, p < 0.001) even after controlling for time (p = 0.590, not significant on its own) — indicating load shedding itself, not simply the passage of time, is doing the explanatory work.
+
+Full narrative and code: [`01_loadshedding_economy_analysis.ipynb`](notebooks/01_loadshedding_economy_analysis.ipynb)
+
+![Load shedding intensity vs retail trade sales growth](charts/01_timeseries_overlay.png)
+
+## Limitations
+
+- **Correlation ≠ causation** — load shedding intensity co-moves with the broader business cycle.
+- **Confounders:** COVID-19 lockdowns (2020–21), the interest-rate cycle, fuel prices, and the July 2021 riots all unfold across the same period.
+- **Regime note:** sustained load shedding largely ended in 2024, so the informative variance in the data mostly sits in 2019–2023.
+- **Multicollinearity:** load shedding intensity and the passage of time are closely related in this dataset, making it hard to fully isolate one effect from the other — the regression coefficient should be read as indicative of magnitude, not a precise causal isolate.
+- Sample size at monthly granularity is modest (n = 49); wide confidence intervals are expected and reported honestly throughout.
+
+## Setup & How to Run
+
+```bash
+git clone <this-repo-url>
+cd loadshedding-economy
+pip install -r requirements.txt
+jupyter notebook
+```
+
+Then open `notebooks/01_loadshedding_economy_analysis.ipynb` and run all cells top to bottom. Raw data files are already included in `data/raw/`; the notebook reads directly from the zip archives without unpacking them.
+
+---
+
+*Portfolio project · BSc IT (Data Science) · July 2026*
