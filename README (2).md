@@ -2,7 +2,7 @@
 
 **Does the severity of Eskom's load shedding measurably move South African retail trade sales — and by how much?**
 
-## 🔑 Key Finding
+## Key Finding
 
 Yes. Across 49 months of real, matched data (April 2022 – April 2026), heavier load shedding was reliably associated with weaker retail trade sales growth: **r = -0.649 (p < 0.0001, 95% CI: -0.786 to -0.450)**. This holds even after controlling for the general upward drift in retail sales over time. The difference between a calm month (0 MW of manual load reduction) and Eskom's worst month (3,213 MW) is associated with an estimated **6.0 percentage-point swing in retail trade sales growth (95% CI: 3.0 to 9.1 points)**.
 
@@ -28,7 +28,10 @@ Built as a portfolio project for a BSc IT (Data Science) final-year student appl
 │       └── monthly_merged.csv # Cleaned, merged monthly dataset
 ├── charts/
 │   └── 01_timeseries_overlay.png
-├── reports/                    # 3–5 page research-style report (coming next)
+├── dashboard/
+│   └── dashboard.pbix         # Interactive Power BI dashboard
+├── reports/
+│   └── Load_Shedding_Research_Report.docx
 └── requirements.txt
 ```
 
@@ -54,8 +57,21 @@ Exact access dates and source URLs are logged in [`data/raw/SOURCES.md`](data/ra
 - **Regression:** Load shedding intensity remains a significant predictor (coefficient = -0.0019 percentage points per MW, p < 0.001) even after controlling for time (p = 0.590, not significant on its own) — indicating load shedding itself, not simply the passage of time, is doing the explanatory work.
 
 Full narrative and code: [`01_loadshedding_economy_analysis.ipynb`](notebooks/01_loadshedding_economy_analysis.ipynb)
+Full written report (3–5 pages): [`Load_Shedding_Research_Report.docx`](reports/Load_Shedding_Research_Report.docx)
 
 ![Load shedding intensity vs retail trade sales growth](charts/01_timeseries_overlay.png)
+
+## Interactive Dashboard
+
+A companion Power BI dashboard (`dashboard/dashboard.pbix`) extends the static analysis above into an interactive view. It includes:
+
+- A dual-axis line chart of load shedding intensity against retail sales growth, month by month
+- A slicer that filters the chart by era ("2022-23: Severe load shedding" vs. "2024+: Load shedding mostly ended"), so the regime shift discussed in the Limitations section below can be explored directly rather than only read about
+- Headline KPI cards: worst month on record (3,213 MW), total months analyzed (49), and average retail sales growth across the full period
+
+Requires Power BI Desktop (free) to open — GitHub does not render `.pbix` files directly in the browser.
+
+![Interactive Power BI dashboard: worst month, months analyzed, average retail growth, and the dual-axis chart with era slicer](charts/02_dashboard_overview.png)
 
 ## Limitations
 
@@ -75,6 +91,8 @@ jupyter notebook
 ```
 
 Then open `notebooks/01_loadshedding_economy_analysis.ipynb` and run all cells top to bottom. Raw data files are already included in `data/raw/`; the notebook reads directly from the zip archives without unpacking them.
+
+To view the interactive dashboard, open `dashboard/dashboard.pbix` in Power BI Desktop.
 
 ---
 
